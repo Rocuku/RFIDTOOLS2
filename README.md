@@ -25,6 +25,7 @@ RFID 读写小工具
 ### 选择命令发送窗口
 下图红框中为选择命令发送窗口，直接选择所需命令根据提示填充内容最后点击按钮即可。该窗口中的所有项目都是在程序同级目录下的setting.xml中定义的。
 ![图5](https://raw.githubusercontent.com/Rocuku/RFIDTOOLS2/master/images/5.png)
+
 setting.xml部分截图如下图。现在已经添加了SSRFID V3.0 Manual中所有命令。
 ![图6](https://raw.githubusercontent.com/Rocuku/RFIDTOOLS2/master/images/6.png)
 
