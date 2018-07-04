@@ -1,0 +1,333 @@
+<?xml version="1.0"?>
+<RT2>
+
+
+<section title="SSRFIDV3.0 Manual" tooltip="SSRFIDV3.0 Manual Functions/Commands">
+
+	<section title="Compact Command" tooltip="Compact Command">
+		<section title="Search card" tooltip="Automatically search cards" uniqueId="01" >
+			<item type="button" text="Start Search"  action0="01" />
+            <item type="label" label="
+				Description: 
+				    look for cards. Return 0x01 while it detects a card in its reading area. Return 0xFE while a card leaves the reading area."
+            />
+		</section>
+		<section title="Read the card serial number" tooltip="Automatically read the card serial number" uniqueId="02" >
+			<item type="button" text="Start Read" action0="02" />
+			<item type="label" label="
+						Description: 
+						    Be ready to read the card. Return the card serial number if a card is detected."
+            />
+        </section> 
+		
+		<section title="Record the card's serial number into an authorization list" tooltip="Card serial number will be automatically stored in the EEPROM" uniqueId="03" >
+			<item type="button" text="Start Record" action0="03" />
+			<item type="label" label="
+				Description: 
+				    Whenever a card enters the reading area, it records the card's serial number into the EEPROM. Maximum 256 cards'number can be recorded.
+				    This module will check the free space of EEPROM from 0x0000. If there are 4 continuous addresses available, it will save the cardnumber there. Each number will be only saved once. If you use this command, we do not recommend you do writing operation 
+				Return:
+				    Success: 03
+				    Fail: FC" 
+			/>					
+		</section>					
+		
+		<section title="Check if a card is in authorization list" tooltip="Automatically determine whether the card is in authorization list" uniqueId="04" >
+			<item type="button" text="Start Check" action0="04" />
+			<item type="label" label="
+				Description:
+				    Whenever the card enters the reading area, check if the card is in the authorization list.
+				Return:
+				    In the list: 04
+				    Not in the list: FB" 
+			/>					
+		</section>	 
+		
+		<section title="Remove a card's serial number from authorization list" tooltip="Automatically determine whether the card is in authorization list" uniqueId="05" >
+			<item type="button" text="Start Remove" action0="05" />
+			<item type="label" label="
+				Description:
+				    Whenever the card enters the reading area, remove the card from authorization list in EEPROM.
+				Return:
+				    In the list: 05
+				    Not in the list: FA" 
+			/>					
+		</section> 
+	</section>
+	<section title="Basic Command" tooltip="Basic Command">
+		<section title="Read the card type" tooltip="Read the card type" uniqueId="11" >
+			<item type="button" text="Read" action0="AB 02 01" />
+			<item type="label" label="
+				Respond:
+				    Success: AB 04 01 [Card_Type] (Checksum)
+				    Fail: AB 02 FE (FC)
+				Card_Type:
+				    0x4400 //Mifare_UltraLight
+				    0x0400 //Mifare_One (S50)
+				    0x0200 //Mifare_One (S70)
+				    0x0800 //Mifare_Pro (X)
+				    0x4403 // Mifare_DESFire"
+			/>					
+		</section>
+		<section title="Read the card serial number" tooltip="Read the card serial number" uniqueId="12" >
+			<item type="button" text="Read" action0="AB 02 02" />
+			<item type="label" label="
+				Respond:
+				    Success: AB 06 02 [Serial Number] (Checksum)
+				    Fail: AB 02 FD (FF)
+				Serial Number: 
+				    4-byte serialnumber of the card"
+			/>					
+		</section>
+		<section title="Read data in a block/page of the card" tooltip="Read data in a block/page of the card" uniqueId="13" >
+			<item type="textbox" defaultValue="04" tooltip="" uniqueId="13BlockpageNumber" label="Block//page Number:" width="180"/>
+			<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="13Keytype" label="Key type:" width="50" />
+			<item type="textbox" defaultValue="ff ff ff ff ff ff" tooltip="" uniqueId="13Key" label="Key:" width="300"/>
+			<item type="button" text="Read" action0="AB 0A 03 $13BlockpageNumber $13Keytype $13Key" />
+			<item type="label" label="
+					Block/page Number:
+					    Mifare 1 S50: 0~63, 16 bytes per block
+					    Mifare 1 S70: 0~255, 16 bytes per block
+					    Mifare Ultralight: 4-15, 4 bytes per page
+					    Mifare Ultralight C: 4-39, 4 bytes per page.
+					Key type: 
+					    00:A type
+					    01:B type
+					Key: 
+					    authorization key, 6 bytes
+					Data: 
+					    the data in that block/page, 16 bytes
+					Respond:
+					    Success: AB [Length] 03 [Data] (Checksum)
+					    Fail: AB 02 FC"
+			/>					
+		</section>
+		<section title="Write data to a block/page of the card" tooltip="Write data to a block/page of the card" uniqueId="14" >
+					<item type="drop-down" values="1A,0E" defaultValue="1A" tooltip="" uniqueId="14Length" label="Length:" width="50" />
+					<item type="textbox" defaultValue="02" tooltip="" uniqueId="14BlockpageNumber" label="Block//page Number:" width="180"/>
+					<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="14Keytype" label="Key type:" width="50" />
+					<item type="textbox" defaultValue="ff ff ff ff ff ff" tooltip="" uniqueId="14Key" label="Key:" width="300"/>
+					<item type="textbox" defaultValue="00 ff 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff" tooltip="" uniqueId="14Data" label="Data:" width="500"/>
+					<item type="button" text="Write" action0="AB $14Length 04 $14BlockpageNumber $14Keytype $14Key $14Data" />
+					<item type="label" label="
+						Length: 
+						    1A/0E
+						Block/page Number:
+						    Mifare 1 S50: 0~63, 16 bytes per block
+						    Mifare 1 S70: 0~255, 16 bytes per block
+						    Mifare Ultralight: 4-15, 4 bytes per page
+						    Mifare Ultralight C: 4-39, 4 bytes per page.
+						Key type: 
+						    00:A type
+						    01:B type
+						Key: 
+						    authorization key, 6 bytes
+						Data: the data in that block/page, 4 bytes (S50/S70) or
+						16 bytes (Ultralight or Ultralight C)
+						Respond:
+						    Success: AB 06 02 [Serial Number] (Checksum)
+						    Fail: AB 02 FD (FF)
+						Serial Number: 
+						    4-byte serialnumber of the card"
+					/>					
+		</section>
+		<section title="Initialize the wallet" tooltip="Initialize the wallet(for S50/S70 only)" uniqueId="15" >
+					<item type="textbox" defaultValue="02" tooltip="" uniqueId="15BlockpageNumber" label="Block//page Number:" width="180"/>
+					<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="15Keytype" label="Key type:" width="50" />
+					<item type="textbox" defaultValue="ff ff ff ff ff ff" tooltip="" uniqueId="15Key" label="Key:" width="300"/>
+					<item type="textbox" defaultValue="00 ff 00 ff" tooltip="" uniqueId="15Value" label="Value:" width="200"/>
+					<item type="button" text="Initialize" action0="AB 0E 05 $15BlockpageNumber $15Keytype $15Key $15Value" />
+					<item type="label" label="
+						Block/page Number: 
+						    0~63 (S50) and 0~255(S70)
+						Key type: 
+						    00:A type
+						    01:B type
+						Key: 
+						    authorization key, 6 bytes
+						Value: 
+						    money amount, 4 bytes, Low Byte first ,High byte last
+						Respond:
+							Success: AB 02 05 (07)
+							Fail: AB 02 FA (F8)"
+					/>					
+		</section>
+		<section title="Recharge wallet" tooltip="Recharge wallet(for S50/S70 only)" uniqueId="16" >
+					<item type="textbox" defaultValue="02" tooltip="" uniqueId="16BlockpageNumber" label="Block//page Number:" width="180"/>
+					<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="16Keytype" label="Key type:" width="50" />
+					<item type="textbox" defaultValue="ff ff ff ff ff ff" tooltip="" uniqueId="16Key" label="Key:" width="300"/>
+					<item type="textbox" defaultValue="00 ff 00 ff" tooltip="" uniqueId="16Value" label="Value:" width="200"/>
+					<item type="button" text="Recharge" action0="AB 0F 06 $16BlockpageNumber $16Keytype $16Key $16Value" />
+					<item type="label" label="
+						Block/page Number: 
+						    0~63 (S50) and 0~255(S70)
+						Key type: 
+						    00:A type
+						    01:B type
+						Key: 
+						    authorization key, 6 bytes
+						Value: 
+						    money amount, 4 bytes, Low Byte first ,High byte last
+						Respond:
+							Success: AB 02 06 (04)
+							Fail: AB 02 F9 (FB)"
+					/>					
+		</section>
+		<section title="Deduct from wallet" tooltip="Deduct from wallet(for S50/S70 only)" uniqueId="17" >
+					<item type="textbox" defaultValue="02" tooltip="" uniqueId="17BlockpageNumber" label="Block//page Number:" width="180"/>
+					<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="17Keytype" label="Key type:" width="50" />
+					<item type="textbox" defaultValue="ff ff ff ff ff ff" tooltip="" uniqueId="17Key" label="Key:" width="300"/>
+					<item type="textbox" defaultValue="00 ff 00 ff" tooltip="" uniqueId="17Value" label="Value:" width="200"/>
+					<item type="button" text="Deduct" action0="AB 0E 07 $17BlockpageNumber $17Keytype $17Key $17Value" />
+					<item type="label" label="
+						Block/page Number: 
+						    0~63 (S50) and 0~255(S70)
+						Key type: 
+						    00:A type
+						    01:B type
+						Key: 
+						    authorization key, 6 bytes
+						Value: 
+						    money amount, 4 bytes, Low Byte first ,High byte last
+						Respond:
+							Success: AB 02 07 (05)
+							Fail: AB 02 F8 (FA)"
+					/>					
+		</section>
+		<section title="Read wallet" tooltip="Read wallet(for S50/S70 only)" uniqueId="18" >
+			<item type="textbox" defaultValue="00 01" tooltip="2 bytes, High byte First" uniqueId="19Address" label="Address:" width="180"/>
+			<item type="button" text="Read" action0="AB 0A 08 $BlockpageNumber $Keytype $Key" />
+			<item type="label" label="
+				Block/page Number: 
+				    0~63 (S50) and 0~255(S70)
+				Key type: 
+				    00:A type
+				    01:B type
+				Key: 
+				    authorization key, 6 bytes
+				Value: 
+				    money amount, 4 bytes, Low Byte first ,High byte last
+				Respond:
+				    Success: AB 06 08 [Value] (Checksum)
+				    Fail: AB 02 F7 (F5)"
+			/>					
+		</section>
+		<section title="Read EEPROM" tooltip="Read EEPROM" uniqueId="19" >
+			<item type="textbox" defaultValue="00 01" tooltip="2 bytes, High byte First" uniqueId="19Address" label="Address:" width="180"/>
+			<item type="textbox" defaultValue="09" tooltip="the byte number to read" uniqueId="19Data_Length" label="Data_Length:" width="180"/>
+			<item type="button" text="Read" action0="AB 05 09 $19Address $19Data_Length " />
+			<item type="label" label="
+					Read data from specified address in EEPROM
+					Address: 
+					    2 bytes, High byte First
+					Data_Length: 
+					    the byte number to read
+					Data: 
+					    4 bytes, the reply data in that address
+					Respond:
+					    Success:  AB [Data_Length+2] 09 [Data] (Checksum)
+					    Fail: AB 02 F6 (F4)"
+					
+			/>					
+		</section>
+		<section title="Write to EEPROM" tooltip="Write to EEPROM" uniqueId="110" >
+					<item type="textbox" defaultValue="09" tooltip="input Data_Length + 5(Hex)" uniqueId="110Data_Length" label="Data_Length + 5:" width="180"/>
+					<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="110Mode" label="Mode:" width="50" />
+					<item type="textbox" defaultValue="00 01" tooltip="" uniqueId="110Address" label="Address:" width="180"/>
+					<item type="textbox" defaultValue="02 03 04 07" tooltip="" uniqueId="110Data" label="Data:" width="180"/>
+					<item type="button" text="Write" action0="AB $110Data_Length 0A $110Mode $110Address $110Data" />
+					<item type="label" label="
+							Write data to EEPROM
+							Data_Length: 
+							    the byte number to write
+							Mode:
+							    00:normal writing
+							    01:compulsive writing
+							Address: 
+							    2 bytes, High byte First
+							Data: 
+							    the data to write
+							Respond:
+							    Success: AB 02 0A (08)
+							    Fail: AB 02 F5 (F7)"
+					/>					
+		</section>
+		<section title="Erase EEPROM" tooltip="Erase EEPROM" uniqueId="111" >
+					<item type="textbox" defaultValue="02" tooltip="" uniqueId="Sector_Number" label="Sector_Number:" width="180"/>
+					<item type="button" text="Erase" action0="AB 03 0B $Sector_Number" />
+					<item type="label" label="
+							Erase data in specified sector of EEPROM
+							Sector_number: 
+							    The sector number of EEPROM
+							Respond:
+							    Success: AB 03 0B 02 (09)
+							    Fail: AB 02 F4 (F6)"
+					/>					
+		</section>
+		<section title="Check status of EEPROM" tooltip="Check status of EEPROM" uniqueId="112" >
+					<item type="textbox" defaultValue="00 00 " tooltip="" uniqueId="112Address" label="Address:" width="180"/>
+					<item type="textbox" defaultValue="04" tooltip="" uniqueId="112Data_Length" label="Data_Length:" width="180"/>
+					<item type="button" text="Check" action0="AB 05 0C $112Address $112Data_Length" />
+					<item type="label" label="
+							Check if the specifiedaddress in EEPROM of isalready written
+							Value:
+							    Address: 2 bytes, High byte First
+							    Data_Length: The address number tobe checked.
+							Respond:
+							    Unwritten: AB 02 0C (0E)
+							    Written: AB 02 F3 (F1)"
+					/>					
+		</section>
+		<section title="Set the checksum in Basic Command" tooltip="Set the checksum in Basic Command" uniqueId="113" >
+					<item type="drop-down" values="00,01" defaultValue="00" tooltip="" uniqueId="checksum" label="Choose Checksum:" width="50" />
+					<item type="button" text="Read" action0="AB 03 0D $checksum" />
+					<item type="label" label="
+							Add or remove checksum of Basic Command
+							Value:
+							    00:No checksum
+							    01:With checksum
+							Respond:
+							    Success: AB 02 0D
+							    Fail: AB 02 F2"
+					/>					
+		</section>
+		<section title="Set the baud rate" tooltip="Set the baud rate" uniqueId="114" >
+					<item type="drop-down" values="01,02,03,04,05,06" defaultValue="02" tooltip="" uniqueId="baudrate" label="Choose Baud Rate:" width="50" />
+					<item type="button" text="Set" action0="AB 03 0E $baudrate" />
+					<item type="label" label="
+							Value:
+							    01:2400
+							    02:4800
+							    03:9600
+							    04:14400
+							    05:19200
+							    06:28800
+							Respond:
+							    Success: AB 02 0E (0C)
+							    Fail: AB 02 F1 (F3)"
+					/>					
+		</section>
+		<section title="Restore the default configuration" tooltip="Restore the default configuration" uniqueId="115" >
+					<item type="button" text="Restore" action0=" AB 02 0F" />
+					<item type="label" label="
+							Restore the default configuration:
+							    No checksum
+							    9600bps
+							Respond:
+							    Success: AB 02 0F (0D)
+							    Fail: AB 02 F0 (F2)"
+					/>					
+		</section>
+		<section title="Set the module in standby mode" tooltip="Set the module in standby mode" uniqueId="116" >
+					<item type="button" text="Set" action0="AB 02 10" />
+					<item type="label" label="
+							Exit from executing any command and wait for new command.
+							
+							Respond:
+							    Success: AB 02 10 (12)
+							    Fail: AB 02 EF (ED)"
+					/>					
+		</section>
+	</section>
+</section>
+</RT2>
